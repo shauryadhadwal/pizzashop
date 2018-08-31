@@ -1,0 +1,34 @@
+{
+    "list": [
+        {
+            "id": "101",
+            "name": "Pencil",
+            "cost": 200
+        },
+        {
+            "id": "102",
+            "name": "Eraser",
+            "cost": 200
+        },
+        {
+            "id": "103",
+            "name": "Pen",
+            "cost": 200
+        },
+        {
+            "id": "104",
+            "name": "Ruler",
+            "cost": 200
+        },
+        {
+            "id": "105",
+            "name": "Notebook",
+            "cost": 200
+        },
+        {
+            "id": "106",
+            "name": "Ink",
+            "cost": 200
+        }
+    ]
+}
