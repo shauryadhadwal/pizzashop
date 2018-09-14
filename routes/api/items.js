@@ -6,11 +6,11 @@
  */
 
 // Dependencies
-const _data = require('../lib/data');
+const _data = require('../../lib/data');
 const _tokens = require('./tokens');
-const validity = require('../lib/validation');
+const validity = require('../../lib/validation');
 
-routingControl = (data, callback) => {
+const routingControl = (data, callback) => {
     const acceptedMethods = ['get'];
     if (acceptedMethods.indexOf(data.method) > -1) {
         _items[data.method](data, callback);

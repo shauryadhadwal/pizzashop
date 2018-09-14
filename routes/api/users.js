@@ -6,11 +6,11 @@
  */
 
 // Dependencies
-const helpers = require('../lib/helpers');
-const config = require('../lib/config');
-const _data = require('../lib/data');
+const helpers = require('../../lib/helpers');
+const config = require('../../lib/config');
+const _data = require('../../lib/data');
 const _tokens = require('./tokens');
-const validity = require('../lib/validation');
+const validity = require('../../lib/validation');
 
 routingControl = (data, callback) => {
     const acceptedMethods = ['get', 'put', 'post', 'delete'];
@@ -120,7 +120,7 @@ _users.put = (data, callback) => {
     const firstName = validity.firstName(data.payload.firstName);
     const lastName = validity.lastName(data.payload.lastName);
     const address = validity.address(data.payload.address);
-    const emailid = validity.emailid(data.payload.emailid);
+    const emailid = validity.email(data.payload.emailid);
     const password = validity.password(data.payload.password);
     const phone = validity.phone(data.payload.phone);
     const token = validity.token(data.headers.token);
@@ -145,7 +145,7 @@ _users.put = (data, callback) => {
                                 userData.lastName = lastName;
                             }
                             if (password) {
-                                userData.hashedPassword = helpers.hash(password);
+                                userData.password = helpers.hash(password);
                             }
                             // Store the new updates
                             _data.update('users', phone, userData, (err) => {
@@ -191,12 +191,12 @@ _users.delete = (data, callback) => {
         // Verify that the given token is valid for the phone number
         _tokens.internal.verifyToken(token, phone, (tokenIsValid) => {
             if (tokenIsValid) {
-                _data.read('users', phone, (err, data) => {
-                    if (!err && data) {
-                        delete data.password;
-                        callback(200, data);
-                    } else {
-                        callback(404)
+                _data.delete('users', phone, (err) => {
+                    if(!err) {
+                        callback(200);
+                    }
+                    else {
+                        callback(500, {error: 'Could not delete'});
                     }
                 });
             } else {

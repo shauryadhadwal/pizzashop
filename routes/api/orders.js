@@ -4,10 +4,10 @@
  */
 
 // Dependencies
-const helpers = require('../lib/helpers');
-const _data = require('../lib/data');
+const helpers = require('../../lib/helpers');
+const _data = require('../../lib/data');
 const _tokens = require('./tokens');
-const validity = require('../lib/validation');
+const validity = require('../../lib/validation');
 
 routingControl = (data, callback) => {
     const acceptedMethods = ['get', 'post'];
