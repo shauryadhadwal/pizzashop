@@ -57,7 +57,7 @@ _cart.post = (data, callback) => {
                                             if (index < 0) {
                                                 userData.cart.push(item);
                                             } else {
-                                                userData.cart[index] = item;
+                                                userData.cart[index].quantity += 1;
                                             }
                                         });
                                     }

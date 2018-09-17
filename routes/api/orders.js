@@ -86,7 +86,7 @@ _orders.post = (data, callback) => {
                                                     userData.cart = [];
                                                     _data.update('users', phone, userData, (err) => {
                                                         if (!err) {
-                                                            callback(200, 'Order Place successfully');
+                                                            callback(200, 'Order Placed successfully');
                                                         } else {
                                                             callback(500, 'Error in updating details');
                                                         }

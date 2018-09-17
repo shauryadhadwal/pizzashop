@@ -14,6 +14,9 @@ app.config = {
 // AJAX Client (for RESTful API)
 app.client = {}
 
+app.cart = {
+    list: []
+}
 // Interface for making API calls
 app.client.request = function (headers, path, method, queryStringObject, payload, callback) {
 
@@ -116,7 +119,6 @@ app.logUserOut = function (redirectUser) {
         if (redirectUser) {
             window.location = '/session/delete';
         }
-
     });
 };
 
@@ -357,6 +359,12 @@ app.loadDataOnPage = function () {
     if (primaryClass == 'accountEdit') {
         app.loadAccountEditPage();
     }
+    if (primaryClass == 'dashboard') {
+        app.loadDashboardPage();
+    }
+    if (primaryClass == 'cart') {
+        app.loadCartPage();
+    }
 };
 
 // Load the account edit page specifically
@@ -365,11 +373,8 @@ app.loadAccountEditPage = function () {
     var phone = typeof (app.config.sessionToken.phone) == 'string' ? app.config.sessionToken.phone : false;
     if (phone) {
         // Fetch the user data
-        var queryStringObject = {
-        };
-        app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined,function (statusCode, responsePayload) {
+        app.client.request(undefined, 'api/users', 'GET', undefined, undefined, function (statusCode, responsePayload) {
             if (statusCode == 200) {
-                debugger
                 // Put the data into the forms as values where needed
                 document.querySelector("#accountEdit1 .firstNameInput").value = responsePayload.firstName;
                 document.querySelector("#accountEdit1 .lastNameInput").value = responsePayload.lastName;
@@ -391,68 +396,55 @@ app.loadAccountEditPage = function () {
     }
 };
 
-// Load the dashboard page specifically
-app.loadChecksListPage = function () {
-    // Get the phone number from the current token, or log the user out if none is there
+app.loadDashboardPage = function () {
     var phone = typeof (app.config.sessionToken.phone) == 'string' ? app.config.sessionToken.phone : false;
     if (phone) {
-        // Fetch the user data
-        var queryStringObject = {
-            'phone': phone
-        };
-        app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined, function (statusCode, responsePayload) {
+        // Fetch the Items from API
+        app.client.request(undefined, 'api/items', 'GET', undefined, undefined, function (statusCode, responsePayload) {
             if (statusCode == 200) {
+                // Use data to create items list
 
-                // Determine how many checks the user has
-                var allChecks = typeof (responsePayload.checks) == 'object' && responsePayload.checks instanceof Array && responsePayload.checks.length > 0 ? responsePayload.checks : [];
-                if (allChecks.length > 0) {
+                for (let index = 0; index < responsePayload.list.length; index++) {
+                    // create a new div element 
+                    const itemContainer = document.createElement("div");
+                    itemContainer.setAttribute('class', 'item');
 
-                    // Show each created check as a new row in the table
-                    allChecks.forEach(function (checkId) {
-                        // Get the data for the check
-                        var newQueryStringObject = {
-                            'id': checkId
-                        };
-                        app.client.request(undefined, 'api/checks', 'GET', newQueryStringObject, undefined, function (statusCode, responsePayload) {
-                            if (statusCode == 200) {
-                                var checkData = responsePayload;
-                                // Make the check data into a table row
-                                var table = document.getElementById("checksListTable");
-                                var tr = table.insertRow(-1);
-                                tr.classList.add('checkRow');
-                                var td0 = tr.insertCell(0);
-                                var td1 = tr.insertCell(1);
-                                var td2 = tr.insertCell(2);
-                                var td3 = tr.insertCell(3);
-                                var td4 = tr.insertCell(4);
-                                td0.innerHTML = responsePayload.method.toUpperCase();
-                                td1.innerHTML = responsePayload.protocol + '://';
-                                td2.innerHTML = responsePayload.url;
-                                var state = typeof (responsePayload.state) == 'string' ? responsePayload.state : 'unknown';
-                                td3.innerHTML = state;
-                                td4.innerHTML = '<a href="/checks/edit?id=' + responsePayload.id + '">View / Edit / Delete</a>';
-                            } else {
-                                console.log("Error trying to load check ID: ", checkId);
-                            }
-                        });
+                    // create a new image container
+                    const imageContainer = document.createElement("img");
+                    imageContainer.setAttribute('src', responsePayload.list[index].src);
+                    imageContainer.setAttribute('alt', responsePayload.list[index].name);
+
+                    const descriptionContainer = document.createElement("p");
+                    descriptionContainer.innerText = responsePayload.list[index].name;
+
+                    const button = document.createElement("button");
+                    button.innerText = "Add to Cart";
+                    button.setAttribute('class', responsePayload.list[index].name);
+                    button.id = responsePayload.list[index].id;
+
+                    button.addEventListener('click', function (event) {
+                        app.addItemToCart(this.id, this.classList[0]);
                     });
 
-                    if (allChecks.length < 5) {
-                        // Show the createCheck CTA
-                        document.getElementById("createCheckCTA").style.display = 'block';
-                    }
+                    itemContainer.appendChild(imageContainer);
+                    itemContainer.appendChild(descriptionContainer);
+                    itemContainer.appendChild(button);
 
-                } else {
-                    // Show 'you have no checks' message
-                    document.getElementById("noChecksMessage").style.display = 'table-row';
+                    // add the newly created element and its content into the DOM 
+                    const listContainer = document.getElementById("itemsContainer");
 
-                    // Show the createCheck CTA
-                    document.getElementById("createCheckCTA").style.display = 'block';
-
+                    listContainer.insertAdjacentElement('beforeend', itemContainer);
                 }
             } else {
                 // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
                 app.logUserOut();
+            }
+        });
+        // Update Cart Link
+        app.client.request(undefined, 'api/cart', 'GET', undefined, undefined, function (statusCode, responsePayload) {
+            if (statusCode == 200) {
+                app.cart.list = responsePayload;
+                document.getElementById('cartLink').innerHTML = 'Cart [' + responsePayload.length + ']';
             }
         });
     } else {
@@ -460,46 +452,113 @@ app.loadChecksListPage = function () {
     }
 };
 
-// Load the checks edit page specifically
-app.loadChecksEditPage = function () {
-    // Get the check id from the query string, if none is found then redirect back to dashboard
-    var id = typeof (window.location.href.split('=')[1]) == 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false;
-    if (id) {
-        // Fetch the check data
-        var queryStringObject = {
-            'id': id
-        };
-        app.client.request(undefined, 'api/checks', 'GET', queryStringObject, undefined, function (statusCode, responsePayload) {
+app.loadCartPage = function () {
+    var phone = typeof (app.config.sessionToken.phone) == 'string' ? app.config.sessionToken.phone : false;
+    if (phone) {
+        // Fetch the Items from API
+        app.client.request(undefined, 'api/cart', 'GET', undefined, undefined, function (statusCode, responsePayload) {
             if (statusCode == 200) {
+                app.cart.list = responsePayload;
 
-                // Put the hidden id field into both forms
-                var hiddenIdInputs = document.querySelectorAll("input.hiddenIdInput");
-                for (var i = 0; i < hiddenIdInputs.length; i++) {
-                    hiddenIdInputs[i].value = responsePayload.id;
+                if (app.cart.list.length == 0) {
+                    document.getElementById('orderButton')[0].setAttribute('hidden', true);
+                } else {
+                    const button = document.getElementById('orderButton');
+                    button.addEventListener('click', function (event) {
+                        app.placeOrder();
+                    });
                 }
 
-                // Put the data into the top form as values where needed
-                document.querySelector("#checksEdit1 .displayIdInput").value = responsePayload.id;
-                document.querySelector("#checksEdit1 .displayStateInput").value = responsePayload.state;
-                document.querySelector("#checksEdit1 .protocolInput").value = responsePayload.protocol;
-                document.querySelector("#checksEdit1 .urlInput").value = responsePayload.url;
-                document.querySelector("#checksEdit1 .methodInput").value = responsePayload.method;
-                document.querySelector("#checksEdit1 .timeoutInput").value = responsePayload.timeoutSeconds;
-                var successCodeCheckboxes = document.querySelectorAll("#checksEdit1 input.successCodesInput");
-                for (var i = 0; i < successCodeCheckboxes.length; i++) {
-                    if (responsePayload.successCodes.indexOf(parseInt(successCodeCheckboxes[i].value)) > -1) {
-                        successCodeCheckboxes[i].checked = true;
-                    }
+                document.getElementById('cartLink').innerHTML = 'Cart [' + responsePayload.length + ']';
+                // Use data to create items list
+                for (let index = 0; index < responsePayload.length; index++) {
+                    // create a new div element 
+                    const itemContainer = document.createElement("div");
+                    itemContainer.setAttribute('class', 'item');
+
+                    const descriptionContainer = document.createElement("p");
+                    descriptionContainer.innerText = responsePayload[index].name;
+
+                    const quantityContainer = document.createElement("p");
+                    quantityContainer.innerText = 'Quantity: ' + responsePayload[index].quantity;
+
+                    const costContainer = document.createElement("p");
+                    costContainer.innerText = 'Cost: ' + responsePayload[index].quantity * responsePayload[index].cost;
+
+                    const button = document.createElement("button");
+                    button.innerText = "Remove from Cart";
+                    button.id = responsePayload[index].id;
+
+                    button.addEventListener('click', function (event) {
+                        app.removeItemFromCart(this.id);
+                    });
+
+                    itemContainer.appendChild(descriptionContainer);
+                    itemContainer.appendChild(quantityContainer);
+                    itemContainer.appendChild(costContainer);
+                    itemContainer.appendChild(button);
+
+                    // add the newly created element and its content into the DOM 
+                    const listContainer = document.getElementById("itemsContainer");
+
+                    listContainer.insertAdjacentElement('beforeend', itemContainer);
                 }
             } else {
-                // If the request comes back as something other than 200, redirect back to dashboard
-                window.location = '/dashboard';
+                // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
+                app.logUserOut();
             }
         });
+
+
     } else {
-        window.location = '/dashboard';
+        app.logUserOut();
     }
+}
+
+app.addItemToCart = function (itemId, name) {
+    app.cart.list.push(itemId);
+    app.client.request(undefined, 'api/cart', 'POST', undefined, {
+        "items": [{
+            "id": itemId,
+            "name": name,
+            "quantity": 1
+        }]
+    }, function (statusCode, responsePayload) {
+        if (statusCode == 200) {
+            index = app.cart.list.findIndex(o => o.id == itemId);
+            if (index > -1) {
+                app.cart.list[index].quantity += 1;
+            } else {
+                app.cart.list.push({
+                    "id": itemId,
+                    "name": name,
+                    "quantity": 1
+                });
+            }
+            document.getElementById('cartLink').innerText = 'Cart [' + app.cart.list.length + ']';
+        }
+    });
+}
+
+app.removeItemFromCart = function (itemId) {
+    app.client.request(undefined, 'api/cart', 'DELETE', {
+        id: itemId
+    }, undefined, function (statusCode, responsePayload) {
+        if (statusCode == 200) {
+            location.reload();
+        }
+    });
 };
+
+app.placeOrder = function () {
+    app.client.request(undefined, 'api/orders', 'POST', undefined, undefined, function (statusCode, responsePayload) {
+        if (statusCode == 200) {
+            alert('Payment was successful');
+        } else {
+            alert('Error: ' + statusCode);
+        }
+    });
+}
 
 // Loop to renew token often
 app.tokenRenewalLoop = function () {
