@@ -120,7 +120,7 @@ body.loggedIn .header ul li.loggedOut {
     border-style: solid;
     margin-bottom: 0px;
     bottom: 0;
-    position: fixed;
+    position: relative;
 }
 
 .footer .copyright {

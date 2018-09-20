@@ -1,1 +1,10 @@
-{"firstName":"Udai","lastName":"Dhadwal","address":"Wiedner Haupstrasse","phone":"4368864020317","emailid":"shauryadhadwal@gmail.com","password":"18c7a796f76b61d396800f649243f7a58ed370154a3b39af52c48a819d0f0040","cart":[{"id":"103","name":"Pen","quantity":1,"cost":200},{"id":"104","name":"Ruler","quantity":3,"cost":200},{"id":"105","name":"Notebook","quantity":4,"cost":200},{"id":"101","name":"Pencil","quantity":1,"cost":200}],"orders":[]}
+{
+    "firstName": "Shaurya",
+    "lastName": "Dhadwal",
+    "address": "ABC",
+    "phone": "4368864020317",
+    "emailid": "shaurya@gmail.com",
+    "password": "18c7a796f76b61d396800f649243f7a58ed370154a3b39af52c48a819d0f0040",
+    "cart": [],
+    "orders": []
+}

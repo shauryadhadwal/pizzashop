@@ -1,7 +1,9 @@
-✔ 1. Signup on the site @done (9/14/2018, 4:06:15 PM)
+✔ 1. View all the current menu items @done (9/19/2018, 2:16:21 PM)
 
-✔ 2. View all the items available to order @done (9/17/2018, 2:23:36 PM)
+✔ 2. View all the recent orders in the system (orders placed in the last 24 hours) @done (9/20/2018, 12:12:50 PM)
 
-✔ 3. Fill up a shopping cart @done (9/17/2018, 2:23:38 PM)
+✔ 3. Lookup the details of a specific order by order ID @done (9/20/2018, 12:12:51 PM)
 
-☐ 4. Place an order (with fake credit card credentials), and receive an email receipt.
+✔ 4. View all the users who have signed up in the last 24 hours @done (9/20/2018, 12:29:59 PM)
+
+☐ 5. Lookup the details of a specific user by email address

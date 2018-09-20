@@ -6,6 +6,7 @@
 const server = require('./lib/server');
 const worker = require('./lib/worker');
 const config = require('./lib/config');
+const cli = require('./lib/cli');
 
 // Declare the app
 const app = {};
@@ -14,8 +15,9 @@ const app = {};
 app.init = () => {
     server.init();
     worker.init();
-    
-    console.log('Environment: ' + config.environment);
+    setTimeout(() => {
+        cli.init();
+    }, 100);
 }
 
 app.init();

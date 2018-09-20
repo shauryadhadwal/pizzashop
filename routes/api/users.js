@@ -49,7 +49,8 @@ _users.post = (data, callback) => {
                         emailid: emailid,
                         password: hashedPassword,
                         cart: [],
-                        orders: []
+                        orders: [],
+                        signupDate: Date.now()
                     }
 
                     // Store the user

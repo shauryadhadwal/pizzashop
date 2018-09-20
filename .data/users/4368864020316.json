@@ -1,1 +1,11 @@
-{"firstName":"Shaurya","lastName":"Dhadwal","address":"Wiedner","phone":"4368864020316","emailid":"shauryadhadwal@gmail.com","password":"fcc3c6395839d3c80582101b62f0ce5f4988da466217847d76467fee5796a394","cart":[],"orders":["5q7sc1535376343457"]}
+{
+    "firstName": "sanya",
+    "lastName": "dixit",
+    "address": "wqe",
+    "phone": "4368864020316",
+    "emailid": "sanya@gmail.com",
+    "password": "18c7a796f76b61d396800f649243f7a58ed370154a3b39af52c48a819d0f0040",
+    "cart": [],
+    "orders": [],
+    "signupDate": 1537438899726
+}
