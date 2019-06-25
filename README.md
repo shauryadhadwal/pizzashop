@@ -1,28 +1,38 @@
-# The Assignment (Scenario):
+# Pizzashop:
 
-It is time to build the Admin CLI for the pizza-delivery app you built in the previous assignments. Please build a CLI interface that would allow the manager of the pizza place to:
+Story Points
 
-1. View all the current menu items
+1. New users can be created, their information can be edited, and they can be deleted. 
+GET /users
+POST /users
+DELETE /users
+PUT /users
 
-    items
+2. Users can log in and log out by creating or destroying a token.
+GET /tokens
+POST/tokens
+DELETE /tokens?id=tokenid
+PUT /tokens
 
-2. View all the recent orders in the system (orders placed in the last 24 hours)
+3. When a user is logged in, they should be able to GET all the possible menu items (these items can be hardcoded into the system).
+GET /items
 
-    orders --recent
+4. A logged-in user should be able to fill a shopping cart with menu items
+GET /cart
+POST/cart
+DELETE /cart?id=orderid
 
-3. Lookup the details of a specific order by order ID
+5. A logged-in user should be able to create an order. 
+GET /orders
+POST/orders
 
-    orders --id {orderid}
+Note: Replace stripe.secret with your own stripe api secret in config.js
 
-4. View all the users who have signed up in the last 24 hours
+6. Send mail to users on successful orders
+Replace mailgun.api with your own stripe api key in config.js s
 
-    users --recent
 
-5. Lookup the details of a specific user by email address
-
-    users --id {userid}'
-
-## Total Commands Available: 
+## Total Commands Available in CLI: 
 
 'exit': 'Kill the Application',
 
